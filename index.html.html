@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title id="docTitle">Món Quà Nhỏ 20/10 ❤️</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --pink-glow: #ff6b9d;
+      --purple-glow: #a855f7;
+      --gold-border: #ffd6a5;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: radial-gradient(ellipse at center, #1f0d2b 0%, #0d0517 60%, #05020a 100%);
+      font-family: 'Nunito', sans-serif;
+      color: #fff;
+    }
+
+    .font-script {
+      font-family: 'Dancing Script', cursive;
+    }
+
+    .font-vibes {
+      font-family: 'Great Vibes', cursive;
+    }
+
+    /* Nền sao vũ trụ */
+    #starCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Các màn hình phân cảnh - ĐÃ FIX LỖI ĐÈ NÚT TRÊN MOBILE */
+    .scene {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none !important;
+      transition: opacity 0.55s ease, visibility 0.55s ease;
+    }
+
+    .scene:not(.active) * {
+      pointer-events: none !important;
+    }
+
+    .scene.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto !important;
+      z-index: 20;
+    }
+
+    /* Thanh nút bấm cố định dưới đáy an toàn cho điện thoại */
+    .bottom-action-bar {
+      position: fixed;
+      bottom: max(1.5rem, env(safe-area-inset-bottom, 1.25rem));
+      left: 50%;
+      transform: translate3d(-50%, 0, 200px);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.65rem;
+      width: 100%;
+      padding: 0 1rem;
+      pointer-events: none;
+    }
+
+    .scene.active .bottom-action-bar button {
+      pointer-events: auto !important;
+    }
+
+    /* Đế ánh sáng vũ trụ dưới chân hoa */
+    .cosmic-pedestal {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 55px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(244, 114, 182, 0.55) 0%, rgba(168, 85, 247, 0.25) 45%, transparent 75%);
+      box-shadow: 0 0 50px rgba(236, 72, 153, 0.5), inset 0 0 25px rgba(255, 255, 255, 0.4);
+      pointer-events: none;
+    }
+
+    .cosmic-pedestal::after {
+      content: '';
+      position: absolute;
+      inset: 12px 35px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 0 20px #f472b6;
+    }
+
+    /* Nút bấm phát sáng */
+    .glow-btn {
+      background: linear-gradient(135deg, #ff7eb3 0%, #ff4d8d 100%);
+      color: white;
+      font-weight: 700;
+      padding: 12px 32px;
+      border-radius: 9999px;
+      border: 2px solid rgba(255, 255, 255, 0.75);
+      box-shadow: 0 0 25px rgba(255, 77, 141, 0.85), inset 0 0 12px rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      letter-spacing: 0.5px;
+      position: relative;
+      z-index: 70;
+      touch-action: manipulation;
+    }
+
+    .glow-btn:active {
+      transform: scale(0.93);
+    }
+
+    /* Hoa hồng nở ở Scene 1 */
+    .rose-item {
+      position: absolute;
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease, top 1.1s ease-in;
+      will-change: transform, opacity, top;
+      filter: drop-shadow(0 8px 18px rgba(136, 19, 55, 0.45));
+      pointer-events: none;
+    }
+
+    .rose-item.bloomed {
+      transform: translate(-50%, -50%) scale(var(--scale, 1)) rotate(var(--rot, 0deg));
+    }
+
+    .rose-item.falling {
+      top: 120vh !important;
+      opacity: 0 !important;
+      transform: translate(-50%, -50%) scale(0.4) rotate(180deg) !important;
+    }
+
+    /* Khung thẻ Scene 2 */
+    .calendar-card {
+      position: relative;
+      width: min(94vw, 900px);
+      max-height: 86dvh;
+      background: radial-gradient(circle at 30% 30%, rgba(56, 20, 60, 0.88), rgba(20, 9, 30, 0.94));
+      border: 2px solid #ffdfb8;
+      border-radius: 24px;
+      box-shadow: 0 0 40px rgba(255, 195, 130, 0.35), inset 0 0 35px rgba(255, 120, 180, 0.18);
+      padding: 16px 14px 44px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    @media (min-width: 640px) {
+      .calendar-card {
+        padding: 28px 32px 64px 32px;
+      }
+    }
+
+    /* Mảnh ghép trái tim */
+    .heart-mosaic-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 2.5px;
+      width: min(68vw, 290px);
+      aspect-ratio: 9 / 8;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .mosaic-tile {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: 0 2px 10px rgba(255, 105, 180, 0.35);
+      opacity: 0;
+      transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(0.2) rotate(var(--r, 25deg));
+      transition: all 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+      background: linear-gradient(135deg, #f43f5e, #a855f7);
+    }
+
+    .mosaic-tile.assembled {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    }
+
+    .mosaic-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Hoa đung đưa dưới đáy thẻ Scene 2 */
+    @keyframes sway {
+      0%, 100% { transform: rotate(-7deg); }
+      50% { transform: rotate(7deg); }
+    }
+
+    .sway-flower {
+      transform-origin: bottom center;
+      animation: sway 3s ease-in-out infinite;
+    }
+
+    /* Scene 3 & 4: Không gian 3D (overflow: hidden giúp không đè lên nút bấm trên Mobile) */
+    .scene-3d-viewport {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      perspective: 850px;
+      -webkit-perspective: 850px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      touch-action: none;
+      z-index: 20;
+    }
+
+    .world-3d {
+      position: relative;
+      width: 1px;
+      height: 1px;
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.06s linear;
+    }
+
+    /* Thẻ lời chúc bay lượn ở Scene 3 - Đã bổ sung transition thu phóng mượt */
+    .floating-note {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 130px;
+      margin-left: -65px;
+      margin-top: -55px;
+      padding: 6px;
+      border-radius: 10px;
+      background: rgba(45, 15, 65, 0.9);
+      border: 1.5px solid rgba(244, 114, 182, 0.75);
+      box-shadow: 0 0 18px rgba(192, 132, 252, 0.45);
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
+      transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.75s ease;
+      cursor: pointer;
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+    }
+
+    @media (min-width: 640px) {
+      .floating-note {
+        width: 155px;
+        margin-left: -77.5px;
+        margin-top: -65px;
+        padding: 7px;
+      }
+    }
+
+    /* Mảnh ảnh 3D ở Scene 4 - Đã bổ sung transition chuyển đổi Quả cầu -> Tường ảnh -> Phong bì */
+    .sphere-photo {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 58px;
+      height: 58px;
+      margin-left: -29px;
+      margin-top: -29px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.88);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 120, 180, 0.5);
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+      transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.75s ease,
+                  width 0.8s ease,
+                  height 0.8s ease,
+                  margin 0.8s ease;
+      cursor: pointer;
+    }
+
+    @media (min-width: 640px) {
+      .sphere-photo {
+        width: 68px;
+        height: 68px;
+        margin-left: -34px;
+        margin-top: -34px;
+      }
+    }
+
+    .sphere-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Phong bì thư phát sáng */
+    @keyframes floatEnvelope {
+      0%, 100% { transform: translateY(0px) rotate(-2deg); }
+      50% { transform: translateY(-14px) rotate(2deg); }
+    }
+
+    .envelope-wrapper {
+      animation: floatEnvelope 3s ease-in-out infinite;
+      cursor: pointer;
+      filter: drop-shadow(0 0 30px rgba(255, 105, 180, 0.85));
+      touch-action: manipulation;
+    }
+
+    /* Thiệp chúc mừng Scene 5 */
+    .love-letter-outer {
+      width: min(92vw, 660px);
+      max-height: 76dvh;
+      background: #ffc2d4;
+      padding: 12px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 45px rgba(255, 130, 175, 0.6);
+      transform: rotate(-1deg) scale(0.8);
+      opacity: 0;
+      transition: all 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .love-letter-outer.open {
+      transform: rotate(-1deg) scale(1);
+      opacity: 1;
+    }
+
+    .love-letter-inner {
+      background: #fff9f5;
+      border: 2.5px dashed #ff8fab;
+      border-radius: 18px;
+      padding: 16px 18px;
+      color: #4a2535;
+      position: relative;
+      min-height: 250px;
+      max-height: calc(76dvh - 24px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      touch-action: pan-y;
+    }
+
+    /* Chữ ký ở góc phải màn hình */
+    .corner-signature-box {
+      position: fixed;
+      right: 12px;
+      bottom: 10px;
+      z-index: 45;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    @media (max-width: 640px) {
+      .corner-signature-box {
+        transform: scale(0.68);
+        transform-origin: bottom right;
+        right: 6px;
+        bottom: 6px;
+      }
+    }
+
+    .corner-signature-box.top-right-pos {
+      bottom: auto;
+      top: 58px;
+    }
+
+    .signature-img-glow {
+      filter: invert(1) brightness(1.9) contrast(1.6) drop-shadow(0 0 8px rgba(255, 120, 180, 0.95));
+      mix-blend-mode: screen;
+      max-width: 140px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .signature-img-dark {
+      mix-blend-mode: multiply;
+      filter: contrast(1.4);
+      max-width: 125px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    @keyframes drawSignature {
+      0% { stroke-dashoffset: 1200; opacity: 0.3; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+
+    .sig-path-animate {
+      stroke-dasharray: 1200;
+      stroke-dashoffset: 0;
+      animation: drawSignature 2.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .spinning {
+      animation: spinSlow 6s linear infinite;
+    }
+
+    /* Lightbox xem ảnh phóng to khi chạm vào ảnh ở trang 3 & 4 */
+    #photoZoomModal {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ec4899;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CẤU HÌNH GỬI HẰNG 11D1 -->
+  <script>
+    const DEFAULT_CONFIG = {
+      pageTitle: "Món Quà Nhỏ 20/10 ❤️",
+      showCornerSignature: true,
+      cornerSignaturePosition: "bottom-right",
+      cornerSignatureLabel: "Created by",
+      signatureImageUrl: "image_582854.png",
+
+      musicUrl: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112191.mp3",
+
+      scene1HintInitial: "✨ Chạm vào màn hình hoặc bấm nút bên dưới để hoa nở rộ ✨",
+      scene1HintBloomed: "🌸 Bấm \"Tiếp tục\" để mở quà nhé 🌸",
+      scene1BtnText: "Tiếp tục 🌸",
+
+      coupleTitle: "",
+      occasionTitle: "Happy Women's Day",
+      monthYearText: "October",
+      highlightDay: 20,
+      scene2BtnText: "Mở ✨",
+
+      floatingMessages: [
+        "Chúc cậu 20/10 ngập tràn niềm vui, ngày càng xinh đẹp, rạng rỡ và học giỏi nhé!",
+        "Chúc cô bạn của tớ ngày 20/10 thật hạnh phúc, luôn giữ vững phong độ học tập và mãi xinh tươi!",
+        "20/10 chúc cậu luôn xinh đẹp, trẻ trung, điểm số cao chót vót và mọi điều suôn sẻ nha!",
+        "Chúc cậu ngày 20/10 thật ý nghĩa, luôn xinh xắn, đáng yêu và con đường học tập rộng mở!",
+        "20/10 chúc cậu luôn giữ được nụ cười rạng rỡ, ngày càng xinh đẹp và đạt kết quả cao trong học tập!",
+        "Chúc cậu bạn của tớ ngày 20/10 thật vui vẻ, luôn xinh đẹp, học giỏi và vạn sự như ý!"
+      ],
+      floatingNoteDateText: "20 Tháng 10 ❤️",
+      scene3HintText: "💡 Vuốt 1 ngón để xoay, dùng 2 ngón tay để thu phóng 3D",
+      scene3BtnText: "Tiếp tục ✨",
+
+      scene4WallBtnText: "Mở Bức Tường Ảnh 🖼️",
+      scene4EnvelopeBtnText: "Nhận Phong Bì Thư 💌",
+      envelopePromptText: "💌 Chạm vào phong bì để mở thư",
+
+      letterTopBadge: "Special Gift For You",
+      letterGreeting: "Gửi Hằng 11D1",
+      letterContent: "Chúc cậu một ngày 20/10 trọn vẹn, thật ấm áp, ngày càng xinh đẹp và học giỏi nhé! Hy vọng cậu sẽ luôn giữ được sự tự tin, năng lượng tích cực và gặt hái thật nhiều thành công trên con đường sắp tới. Cứ mãi vui vẻ và tỏa sáng theo cách của riêng cậu nhé!",
+      letterExtraContent: "",
+      letterFooterLeft: "20/10 vui vẻ nhaa",
+      letterSignature: "Dương ❤️",
+      showSignatureInLetter: true,
+      scene5ReplayBtnText: "Xem lại từ đầu ↻",
+
+      photos: [
+        "images/anh1.jpg", "images/anh2.jpg", "images/anh3.jpg", "images/anh4.jpg",
+        "images/anh5.jpg", "images/anh6.jpg", "images/anh7.jpg", "images/anh8.jpg",
+        "images/anh9.jpg", "images/anh10.jpg", "images/anh11.jpg", "images/anh12.jpg",
+        "images/anh13.jpg", "images/anh14.jpg", "images/anh15.jpg", "images/anh16.jpg",
+        "images/anh17.jpg", "images/anh18.jpg"
+      ]
+    };
+
+    let CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  </script>
+
+  <audio id="bgMusic" loop preload="auto"></audio>
+  <canvas id="starCanvas"></canvas>
+
+  <!-- MODAL PHÓNG TO ẢNH KHI CHẠM TRÊN ĐIỆN THOẠI / MÁY TÍNH -->
+  <div id="photoZoomModal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-4 opacity-0 invisible pointer-events-none">
+    <div class="relative max-w-sm w-full bg-[#2a1038] border-2 border-pink-300/80 rounded-2xl p-3 shadow-[0_0_40px_rgba(255,105,180,0.7)] transform transition-transform duration-300 scale-95" id="photoZoomCard">
+      <img id="photoZoomImg" src="" alt="Preview" class="w-full max-h-[60dvh] object-contain rounded-xl border border-white/20" />
+      <p id="photoZoomCaption" class="text-center text-pink-100 text-sm sm:text-base font-semibold mt-3 px-2"></p>
+      <button id="closeZoomModalBtn" class="mt-3 w-full py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-sm shadow-lg">Đóng ✨</button>
+    </div>
+  </div>
+
+  <!-- CHỮ KÝ GÓC PHẢI MÀN HÌNH -->
+  <div id="cornerSignatureContainer" class="corner-signature-box">
+    <span id="uiCornerSigLabel" class="text-[10px] uppercase tracking-widest text-pink-300/75 font-semibold mb-0.5 pr-1">
+      Created by
+    </span>
+    <img id="cornerSigImg" src="" alt="Chữ ký Dương" class="signature-img-glow hidden" />
+    <div id="cornerSigSvgWrapper" class="filter drop-shadow-[0_0_10px_rgba(255,115,179,0.9)]">
+      <svg width="145" height="78" viewBox="40 140 560 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="sig-path-animate"
+          d="M 232 232 C 198 198, 225 155, 315 162 C 405 168, 438 220, 412 298 C 385 372, 275 432, 232 418 C 198 408, 212 340, 295 235 L 242 392 M 252 332 C 258 272, 165 242, 72 292 C 42 308, 52 318, 135 318 L 418 318 C 412 335, 412 345, 422 345 C 432 345, 442 325, 446 316 C 442 335, 444 345, 454 344 C 465 342, 476 318, 488 316 C 498 315, 496 344, 482 346 C 468 346, 468 320, 486 312 C 496 308, 496 322, 504 326 C 510 318, 516 312, 518 342 C 525 322, 535 312, 540 338 C 548 338, 566 314, 558 312 C 545 310, 535 335, 546 340 C 556 342, 568 320, 572 312 L 516 452 L 508 386 C 496 378, 496 370, 520 358 L 582 322"
+          stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+        <path class="sig-path-animate" d="M 150 538 Q 335 472 518 478" stroke="#ff9ebb" stroke-width="8" stroke-linecap="round" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- THANH ĐIỀU KHIỂN GÓC TRÊN BÊN PHẢI -->
+  <div class="fixed top-3 right-3 z-[80] flex items-center gap-2">
+    <div class="flex items-center gap-2 bg-black/50 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/20">
+      <button type="button" data-scene="1" class="scene-dot w-3 h-3 rounded-full bg-pink-400 transition-all"></button>
+      <button type="button" data-scene="2" class="scene-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-pink-300 transition-all"></button>
+      <button type="button" data-scene="3" class="scene-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-pink-300 transition-all"></button>
+      <button type="button" data-scene="4" class="scene-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-pink-300 transition-all"></button>
+      <button type="button" data-scene="5" class="scene-dot w-2.5 h-2.5 rounded-full bg-white/30 hover:bg-pink-300 transition-all"></button>
+    </div>
+
+    <button type="button" id="musicToggleBtn" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-pink-500/85 hover:bg-pink-500 backdrop-blur-md border border-white/50 flex items-center justify-center shadow-lg transition" title="Bật / Tắt nhạc">
+      <span id="musicIcon" class="text-base sm:text-lg">🎵</span>
+    </button>
+  </div>
+
+  <!-- SCENE 1: VƯỜN HOA NỞ RỘ -->
+  <section id="scene1" class="scene active">
+    <div class="cosmic-pedestal"></div>
+    <div id="roseGarden" class="relative w-full h-full overflow-hidden"></div>
+    <div class="bottom-action-bar">
+      <p id="scene1Hint" class="text-pink-200/95 text-xs sm:text-base font-semibold tracking-wide animate-pulse text-center bg-black/35 px-3 py-1 rounded-full backdrop-blur-sm"></p>
+      <button type="button" id="scene1NextBtn" class="glow-btn text-sm sm:text-lg"></button>
+    </div>
+  </section>
+
+  <!-- SCENE 2: TRÁI TIM GHÉP ẢNH & LỊCH THÁNG 10 -->
+  <section id="scene2" class="scene">
+    <div class="calendar-card">
+      <div class="text-center mb-1">
+        <h1 id="uiCoupleTitle" class="font-script text-2xl sm:text-4xl text-pink-100 drop-shadow-[0_0_15px_rgba(255,105,180,0.8)]"></h1>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-6 items-center my-auto z-10">
+        <div class="md:col-span-7 flex flex-col items-center justify-center relative">
+          <div id="heartMosaic" class="heart-mosaic-grid"></div>
+          <button type="button" id="scene2NextBtn" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 px-6 py-2.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-2 border-white/90 shadow-[0_0_25px_rgba(255,105,180,1)] text-xs sm:text-sm font-extrabold transition-all duration-500 opacity-0 scale-75 pointer-events-none whitespace-nowrap"></button>
+        </div>
+        <div class="md:col-span-5 flex flex-col items-center text-center">
+          <h2 id="uiOccasionTitle" class="font-vibes text-3xl sm:text-4xl text-pink-200 drop-shadow-[0_0_12px_rgba(255,180,220,0.7)]"></h2>
+          <p id="uiMonthYear" class="font-script text-lg sm:text-2xl text-pink-300/90 mt-0.5 mb-1.5"></p>
+          <div class="w-full max-w-[220px] sm:max-w-[260px] bg-white/5 rounded-2xl p-2 sm:p-3 border border-white/10">
+            <div class="grid grid-cols-7 gap-1 text-[10px] sm:text-[11px] font-bold text-pink-300 mb-1">
+              <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+            </div>
+            <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1 text-[11px] sm:text-xs text-pink-100/80 font-semibold items-center justify-items-center"></div>
+          </div>
+        </div>
+      </div>
+      <div id="bottomFlowerRow" class="absolute bottom-0 left-0 right-0 h-10 sm:h-14 flex items-end justify-around px-2 pointer-events-none overflow-hidden"></div>
+    </div>
+  </section>
+
+  <!-- SCENE 3: HOA NGÂN HÀ & VÒNG XOAY LỜI CHÚC 3D -->
+  <section id="scene3" class="scene">
+    <canvas id="galaxyFlowerCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-10"></canvas>
+    <div id="scene3Viewport" class="scene-3d-viewport">
+      <div id="notesWorld3D" class="world-3d"></div>
+    </div>
+    <div class="bottom-action-bar">
+      <span id="uiScene3Hint" class="text-[11px] sm:text-sm text-purple-200/95 bg-black/55 px-3.5 py-1 rounded-full border border-purple-400/35 text-center backdrop-blur-sm"></span>
+      <button type="button" id="scene3NextBtn" class="glow-btn text-xs sm:text-base">Tiếp tục ✨</button>
+    </div>
+  </section>
+
+  <!-- SCENE 4: QUẢ CẦU ẢNH 3D -> TƯỜNG ẢNH -> PHONG BÌ THƯ -->
+  <section id="scene4" class="scene">
+    <div id="scene4Viewport" class="scene-3d-viewport">
+      <div id="sphereWorld3D" class="world-3d"></div>
+    </div>
+    <div id="floatingEnvelopeModal" class="fixed inset-0 z-40 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-opacity duration-700">
+      <div id="envelopeTrigger" class="envelope-wrapper flex flex-col items-center">
+        <svg width="165" height="125" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="30" width="180" height="110" rx="14" fill="#FF8FAB" stroke="#FFE5EC" stroke-width="3"/>
+          <rect x="26" y="14" width="148" height="95" rx="10" fill="#FFF9F5" stroke="#FFC2D1" stroke-width="2"/>
+          <path d="M100 45 C100 37 88 32 83 39 C78 46 86 55 100 65 C114 55 122 46 117 39 C112 32 100 37 100 45 Z" fill="#FF4D6D"/>
+          <path d="M12 35 L100 95 L12 138 Z" fill="#FFB3C6"/>
+          <path d="M188 35 L100 95 L188 138 Z" fill="#FFB3C6"/>
+          <path d="M12 138 L100 84 L188 138 Z" fill="#FF758F"/>
+          <circle cx="100" cy="88" r="18" fill="#FFF0F3" stroke="#FF4D6D" stroke-width="2"/>
+          <path d="M100 83 C100 79 93 76 90 80 C87 84 92 90 100 96 C108 90 113 84 110 80 C107 76 100 79 100 83 Z" fill="#FF0A54"/>
+        </svg>
+        <span id="uiEnvelopePrompt" class="mt-3 px-4 py-1.5 rounded-full bg-pink-500/95 text-white font-bold text-xs sm:text-sm shadow-lg border border-white/70 animate-bounce"></span>
+      </div>
+    </div>
+    <div class="bottom-action-bar">
+      <span id="uiScene4Hint" class="text-[11px] sm:text-sm text-pink-200/95 bg-black/55 px-3.5 py-1 rounded-full border border-pink-400/35 text-center backdrop-blur-sm">💡 Vuốt để xoay, 2 ngón tay để phóng to hoặc chạm vào ảnh</span>
+      <button type="button" id="scene4ActionBtn" class="glow-btn text-xs sm:text-base">Mở Bức Tường Ảnh 🖼️</button>
+    </div>
+  </section>
+
+  <!-- SCENE 5: BỨC THƯ TÌNH CẢM -->
+  <section id="scene5" class="scene">
+    <div id="scene5BgPhotos" class="fixed inset-0 flex items-center justify-center gap-3 sm:gap-6 opacity-35 pointer-events-none px-3 flex-wrap"></div>
+    <div id="loveLetterCard" class="love-letter-outer z-20 mx-3">
+      <div class="love-letter-inner">
+        <div class="flex justify-between items-center text-pink-400 text-sm sm:text-lg shrink-0">
+          <span>💕</span>
+          <span id="uiLetterTopBadge" class="text-[10px] sm:text-xs uppercase tracking-widest text-pink-400 font-bold"></span>
+          <span>💕</span>
+        </div>
+        <h2 id="uiLetterGreeting" class="font-script text-2xl sm:text-4xl text-rose-500 font-bold text-center my-1 shrink-0"></h2>
+        <div class="my-auto py-2 px-1 sm:px-5 text-center space-y-2 overflow-y-auto max-h-[36dvh]">
+          <div id="typewriterText" class="text-xs sm:text-base md:text-lg leading-relaxed font-semibold text-stone-700 whitespace-pre-line text-left sm:text-center min-h-[75px]"></div>
+          <div id="uiLetterExtra" class="text-xs sm:text-sm italic text-rose-500/90 font-semibold whitespace-pre-line pt-2 border-t border-pink-200/50 hidden"></div>
+        </div>
+        <div class="flex items-end justify-between mt-2 pt-2 border-t border-pink-200/70 shrink-0">
+          <div class="flex items-center gap-1.5 text-lg sm:text-2xl">
+            <span>🐰</span>
+            <span id="uiLetterFooterLeft" class="text-xs sm:text-sm text-pink-400 font-bold"></span>
+          </div>
+          <div class="flex flex-col items-end text-right">
+            <div id="letterHandSignature" class="mb-0.5">
+              <img id="letterSigImg" src="" alt="Chữ ký" class="signature-img-dark hidden" />
+              <svg id="letterSigSvg" width="100" height="48" viewBox="40 140 560 430" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 232 232 C 198 198, 225 155, 315 162 C 405 168, 438 220, 412 298 C 385 372, 275 432, 232 418 C 198 408, 212 340, 295 235 L 242 392 M 252 332 C 258 272, 165 242, 72 292 C 42 308, 52 318, 135 318 L 418 318 C 412 335, 412 345, 422 345 C 432 345, 442 325, 446 316 C 442 335, 444 345, 454 344 C 465 342, 476 318, 488 316 C 498 315, 496 344, 482 346 C 468 346, 468 320, 486 312 C 496 308, 496 322, 504 326 C 510 318, 516 312, 518 342 C 525 322, 535 312, 540 338 C 548 338, 566 314, 558 312 C 545 310, 535 335, 546 340 C 556 342, 568 320, 572 312 L 516 452 L 508 386 C 496 378, 496 370, 520 358 L 582 322" stroke="#be123c" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M 150 538 Q 335 472 518 478" stroke="#e11d48" stroke-width="9" stroke-linecap="round" />
+              </svg>
+            </div>
+            <p id="uiLetterSignature" class="font-script text-base sm:text-2xl text-rose-500 font-bold"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-action-bar">
+      <button type="button" id="scene5ReplayBtn" class="glow-btn text-xs sm:text-base">Xem lại từ đầu ↻</button>
+    </div>
+  </section>
+
+  <script>
+    // Hàm hỗ trợ gán sự kiện bấm nhạy trên cả Điện thoại (Touch) và Máy tính (Click)
+    function bindTap(el, handler) {
+      if (!el) return;
+      let lastTapTime = 0;
+      el.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        const now = Date.now();
+        if (now - lastTapTime < 350) return;
+        lastTapTime = now;
+        handler(e);
+      }, { passive: false });
+
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const now = Date.now();
+        if (now - lastTapTime < 350) return;
+        lastTapTime = now;
+        handler(e);
+      });
+    }
+
+    // Ảnh dự phòng SVG nếu ảnh trong thư mục chưa kịp tải
+    const FALLBACK_SVG = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff7eb3"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+        <rect width="200" height="200" fill="url(#g)"/>
+        <path d="M100 150 C100 150 45 112 45 72 C45 50 64 36 82 44 C92 48 100 58 100 58 C100 58 108 48 118 44 C136 36 155 50 155 72 C155 112 100 150 100 150 Z" fill="#fff" opacity="0.85"/>
+      </svg>
+    `);
+
+    function setSafeImage(imgEl, src) {
+      imgEl.onerror = () => {
+        if (imgEl.src !== FALLBACK_SVG) imgEl.src = FALLBACK_SVG;
+      };
+      imgEl.src = src;
+    }
+
+    function updateGlobalTextsAndSignature() {
+      document.title = CONFIG.pageTitle || "Món Quà Nhỏ 20/10 ❤️";
+      const sigContainer = document.getElementById('cornerSignatureContainer');
+      const sigLabel = document.getElementById('uiCornerSigLabel');
+      const cornerSigImg = document.getElementById('cornerSigImg');
+      const cornerSigSvg = document.getElementById('cornerSigSvgWrapper');
+      const letterSigImg = document.getElementById('letterSigImg');
+      const letterSigSvg = document.getElementById('letterSigSvg');
+
+      sigLabel.textContent = CONFIG.cornerSignatureLabel || "";
+      if (CONFIG.cornerSignaturePosition === 'top-right') {
+        sigContainer.classList.add('top-right-pos');
+      } else {
+        sigContainer.classList.remove('top-right-pos');
+      }
+
+      if (CONFIG.signatureImageUrl) {
+        const testImg = new Image();
+        testImg.onload = () => {
+          cornerSigImg.src = CONFIG.signatureImageUrl;
+          cornerSigImg.classList.remove('hidden');
+          cornerSigSvg.classList.add('hidden');
+          letterSigImg.src = CONFIG.signatureImageUrl;
+          letterSigImg.classList.remove('hidden');
+          letterSigSvg.classList.add('hidden');
+        };
+        testImg.onerror = () => {
+          cornerSigImg.classList.add('hidden');
+          cornerSigSvg.classList.remove('hidden');
+          letterSigImg.classList.add('hidden');
+          letterSigSvg.classList.remove('hidden');
+        };
+        testImg.src = CONFIG.signatureImageUrl;
+      }
+    }
+
+    // Nhạc nền
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+    const musicIcon = document.getElementById('musicIcon');
+    let isMusicPlaying = false;
+    bgMusic.src = CONFIG.musicUrl;
+
+    async function playMusic() {
+      if (isMusicPlaying) return;
+      try {
+        await bgMusic.play();
+        isMusicPlaying = true;
+        musicIcon.textContent = '🎵';
+        musicIcon.classList.add('spinning');
+      } catch (e) {
+        isMusicPlaying = false;
+      }
+    }
+
+    bindTap(musicToggleBtn, () => {
+      if (isMusicPlaying) {
+        isMusicPlaying = false;
+        bgMusic.pause();
+        musicIcon.classList.remove('spinning');
+        musicIcon.textContent = '🔇';
+      } else {
+        playMusic();
+      }
+    });
+
+    // Nút chấm chuyển nhanh các trang trên góc phải
+    document.querySelectorAll('.scene-dot').forEach(btn => {
+      bindTap(btn, () => {
+        const target = Number(btn.getAttribute('data-scene'));
+        if (target) goToScene(target);
+      });
+    });
+
+    // Modal xem ảnh phóng to
+    const photoZoomModal = document.getElementById('photoZoomModal');
+    const photoZoomImg = document.getElementById('photoZoomImg');
+    const photoZoomCaption = document.getElementById('photoZoomCaption');
+    const closeZoomModalBtn = document.getElementById('closeZoomModalBtn');
+
+    function openPhotoZoom(imgSrc, captionText) {
+      setSafeImage(photoZoomImg, imgSrc);
+      photoZoomCaption.textContent = captionText || CONFIG.floatingNoteDateText;
+      photoZoomModal.classList.remove('opacity-0', 'invisible', 'pointer-events-none');
+    }
+
+    function closePhotoZoom() {
+      photoZoomModal.classList.add('opacity-0', 'invisible', 'pointer-events-none');
+    }
+
+    bindTap(closeZoomModalBtn, closePhotoZoom);
+    bindTap(photoZoomModal, (e) => {
+      if (e.target === photoZoomModal) closePhotoZoom();
+    });
+
+    function getPhoto(index) {
+      const list = CONFIG.photos && CONFIG.photos.length > 0 ? CONFIG.photos : DEFAULT_CONFIG.photos;
+      return list[index % list.length];
+    }
+
+    // Bầu trời sao
+    const starCanvas = document.getElementById('starCanvas');
+    const starCtx = starCanvas.getContext('2d');
+    let stars = [];
+    function resizeStarCanvas() {
+      starCanvas.width = window.innerWidth;
+      starCanvas.height = window.innerHeight;
+      stars = Array.from({ length: 140 }, () => ({
+        x: Math.random() * starCanvas.width,
+        y: Math.random() * starCanvas.height,
+        r: Math.random() * 1.8 + 0.4,
+        alpha: Math.random(),
+        speed: (Math.random() * 0.018 + 0.004) * (Math.random() < 0.5 ? 1 : -1),
+        hue: Math.random() < 0.6 ? 320 : 275
+      }));
+    }
+    function animateStars() {
+      starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+      for (const s of stars) {
+        s.alpha += s.speed;
+        if (s.alpha > 1 || s.alpha < 0.15) s.speed *= -1;
+        starCtx.beginPath();
+        starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        starCtx.fillStyle = `hsla(${s.hue}, 90%, 85%, ${Math.max(0.1, Math.min(1, s.alpha))})`;
+        starCtx.fill();
+      }
+      requestAnimationFrame(animateStars);
+    }
+    window.addEventListener('resize', resizeStarCanvas);
+    resizeStarCanvas();
+    animateStars();
+
+    // ================= SCENE 1 =================
+    const roseGarden = document.getElementById('roseGarden');
+    const scene1NextBtn = document.getElementById('scene1NextBtn');
+    const scene1Hint = document.getElementById('scene1Hint');
+    let rosesFullBloomed = false;
+    let scene1Transitioning = false;
+
+    function createRoseSVG(palette) {
+      const { outer, mid, inner, center } = palette;
+      return `
+        <svg viewBox="0 0 120 120" class="w-full h-full">
+          <g fill="${outer}" opacity="0.95">
+            <circle cx="60" cy="24" r="22"/><circle cx="92" cy="42" r="22"/><circle cx="88" cy="80" r="22"/><circle cx="52" cy="94" r="22"/><circle cx="24" cy="74" r="22"/><circle cx="28" cy="38" r="22"/>
+          </g>
+          <g fill="${mid}">
+            <ellipse cx="60" cy="34" rx="20" ry="16" transform="rotate(15 60 34)"/><ellipse cx="82" cy="55" rx="20" ry="16" transform="rotate(75 82 55)"/><ellipse cx="73" cy="80" rx="20" ry="16" transform="rotate(135 73 80)"/><ellipse cx="43" cy="78" rx="20" ry="16" transform="rotate(205 43 78)"/><ellipse cx="38" cy="48" rx="20" ry="16" transform="rotate(295 38 48)"/>
+          </g>
+          <g fill="${inner}">
+            <circle cx="60" cy="46" r="15"/><circle cx="72" cy="60" r="15"/><circle cx="58" cy="70" r="15"/><circle cx="47" cy="57" r="15"/>
+          </g>
+          <circle cx="60" cy="58" r="11" fill="${center}"/>
+          <path d="M54 56 C57 50, 66 51, 66 58 C66 64, 56 65, 53 59" stroke="${outer}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        </svg>`;
+    }
+
+    const rosePalettes = [
+      { outer: '#f43f5e', mid: '#fb7185', inner: '#fda4af', center: '#ffe4e6' },
+      { outer: '#ec4899', mid: '#f472b6', inner: '#f9a8d4', center: '#fce7f3' },
+      { outer: '#fda4af', mid: '#fecdd3', inner: '#ffe4e6', center: '#fff1f2' }
+    ];
+
+    function initScene1Cluster() {
+      roseGarden.innerHTML = '';
+      rosesFullBloomed = false;
+      scene1Transitioning = false;
+      scene1Hint.textContent = CONFIG.scene1HintInitial;
+      scene1NextBtn.textContent = CONFIG.scene1BtnText;
+      for (let i = 0; i < 18; i++) {
+        const angle = (i / 18) * Math.PI * 2;
+        const radius = i < 6 ? (i * 12) : (55 + (i % 6) * 14);
+        spawnRose(
+          50 + Math.cos(angle) * (radius / window.innerWidth * 100 * 1.4),
+          45 + Math.sin(angle) * (radius / window.innerHeight * 100 * 1.4),
+          85 + (i % 3) * 20,
+          i * 40
+        );
+      }
+    }
+
+    function spawnRose(xPercent, yPercent, sizePx, delayMs) {
+      const div = document.createElement('div');
+      div.className = 'rose-item';
+      div.style.width = `${sizePx}px`;
+      div.style.height = `${sizePx}px`;
+      div.style.left = `${xPercent}%`;
+      div.style.top = `${yPercent}%`;
+      div.style.setProperty('--scale', (0.85 + Math.random() * 0.45).toFixed(2));
+      div.style.setProperty('--rot', `${Math.floor(Math.random() * 360)}deg`);
+      div.innerHTML = createRoseSVG(rosePalettes[Math.floor(Math.random() * rosePalettes.length)]);
+      roseGarden.appendChild(div);
+      setTimeout(() => div.classList.add('bloomed'), delayMs);
+    }
+
+    function bloomFullScreenRoses() {
+      if (rosesFullBloomed) return;
+      rosesFullBloomed = true;
+      playMusic();
+      scene1Hint.textContent = CONFIG.scene1HintBloomed;
+      const isMobile = window.innerWidth < 640;
+      const cols = isMobile ? 5 : 10;
+      const rows = isMobile ? 7 : 7;
+      for (let r = 0; r <= rows; r++) {
+        for (let c = 0; c <= cols; c++) {
+          const x = (c / cols) * 104 - 2 + (Math.random() * 6 - 3);
+          const y = (r / rows) * 104 - 2 + (Math.random() * 6 - 3);
+          spawnRose(x, y, isMobile ? 105 : 150, Math.hypot(x - 50, y - 48) * 12 + Math.random() * 180);
+        }
+      }
+    }
+
+    bindTap(document.getElementById('scene1'), (e) => {
+      if (e.target.closest('#musicToggleBtn') || e.target.closest('#scene1NextBtn') || e.target.closest('.scene-dot')) return;
+      if (!rosesFullBloomed) bloomFullScreenRoses();
+    });
+
+    bindTap(scene1NextBtn, () => {
+      if (scene1Transitioning) return;
+      playMusic();
+      if (!rosesFullBloomed) {
+        bloomFullScreenRoses();
+        return;
+      }
+      scene1Transitioning = true;
+      roseGarden.querySelectorAll('.rose-item').forEach(r => r.classList.add('falling'));
+      setTimeout(() => goToScene(2), 750);
+    });
+
+    // ================= SCENE 2 =================
+    const HEART_MASK = [
+      [0, 1, 1, 0, 0, 0, 1, 1, 0],
+      [1, 1, 1, 1, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 1, 1, 0, 0],
+      [0, 0, 0, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0, 0, 0]
+    ];
+
+    function initScene2() {
+      document.getElementById('uiCoupleTitle').textContent = CONFIG.coupleTitle;
+      document.getElementById('uiOccasionTitle').textContent = CONFIG.occasionTitle;
+      document.getElementById('uiMonthYear').textContent = CONFIG.monthYearText;
+      const nextBtn = document.getElementById('scene2NextBtn');
+      nextBtn.textContent = CONFIG.scene2BtnText;
+
+      const calGrid = document.getElementById('calendarDaysGrid');
+      calGrid.innerHTML = '';
+      for (let i = 0; i < 3; i++) calGrid.appendChild(document.createElement('span'));
+      for (let d = 1; d <= 31; d++) {
+        const cell = document.createElement('span');
+        cell.textContent = d;
+        if (d === Number(CONFIG.highlightDay)) {
+          cell.className = 'w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-rose-500 to-pink-400 text-white font-extrabold flex items-center justify-center shadow-[0_0_12px_#ff4d8d] scale-110';
+        } else {
+          cell.className = 'py-0.5';
+        }
+        calGrid.appendChild(cell);
+      }
+
+      // Khởi tạo hàng hoa đung đưa dưới đáy thẻ Scene 2
+      const bottomFlowerRow = document.getElementById('bottomFlowerRow');
+      bottomFlowerRow.innerHTML = '';
+      const flowerCount = window.innerWidth < 640 ? 10 : 16;
+      for (let i = 0; i < flowerCount; i++) {
+        const fl = document.createElement('div');
+        fl.className = 'sway-flower text-lg sm:text-2xl select-none';
+        fl.style.animationDelay = `${(i * 0.22).toFixed(2)}s`;
+        fl.textContent = i % 2 === 0 ? '🌷' : '🌸';
+        bottomFlowerRow.appendChild(fl);
+      }
+
+      const mosaicContainer = document.getElementById('heartMosaic');
+      mosaicContainer.innerHTML = '';
+      nextBtn.classList.add('opacity-0', 'scale-75', 'pointer-events-none');
+      let photoIdx = 0, tilesToAnimate = [];
+
+      HEART_MASK.forEach(row => {
+        row.forEach(val => {
+          if (val === 1) {
+            const tile = document.createElement('div');
+            tile.className = 'mosaic-tile';
+            const angle = Math.random() * Math.PI * 2;
+            tile.style.setProperty('--tx', `${Math.cos(angle) * 180}px`);
+            tile.style.setProperty('--ty', `${Math.sin(angle) * 180}px`);
+            const img = document.createElement('img');
+            setSafeImage(img, getPhoto(photoIdx++));
+            tile.appendChild(img);
+            mosaicContainer.appendChild(tile);
+            tilesToAnimate.push(tile);
+          } else {
+            mosaicContainer.appendChild(document.createElement('div'));
+          }
+        });
+      });
+
+      tilesToAnimate.forEach((tile, idx) => setTimeout(() => tile.classList.add('assembled'), 60 + idx * 30));
+      setTimeout(() => {
+        nextBtn.classList.remove('opacity-0', 'scale-75', 'pointer-events-none');
+      }, 60 + tilesToAnimate.length * 30 + 150);
+    }
+
+    bindTap(document.getElementById('scene2NextBtn'), () => {
+      goToScene(3);
+    });
+
+    // ================= SCENE 3 =================
+    const galaxyCanvas = document.getElementById('galaxyFlowerCanvas');
+    const gCtx = galaxyCanvas.getContext('2d');
+    const notesWorld3D = document.getElementById('notesWorld3D');
+    let scene3Active = false, scene3VortexMode = false, flowerParticles = [];
+    let scene3RotY = 0, scene3RotX = -6, scene3Zoom = 1;
+
+    function initGalaxyFlowerParticles() {
+      galaxyCanvas.width = window.innerWidth;
+      galaxyCanvas.height = window.innerHeight;
+      flowerParticles = [];
+      const isMobile = window.innerWidth < 640;
+      const scaleFactor = isMobile ? 0.65 : 1;
+
+      // Hạt cánh hoa ngân hà
+      for (let i = 0; i < 360; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const r = Math.random() * (Math.abs(Math.cos(2.5 * theta)) * 95 + 20) * scaleFactor;
+        flowerParticles.push({
+          x: Math.cos(theta) * r,
+          y: (-Math.abs(Math.sin(2.5 * theta)) * 32 - (isMobile ? 75 : 65)),
+          z: Math.sin(theta) * r,
+          color: Math.random() < 0.55 ? '#f472b6' : (Math.random() < 0.5 ? '#c084fc' : '#fde047'),
+          size: Math.random() * 2.2 + 0.8
+        });
+      }
+
+      // Hạt vòng đế ngân hà
+      for (let i = 0; i < 160; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const r = (50 + Math.random() * 110) * scaleFactor;
+        flowerParticles.push({
+          x: Math.cos(theta) * r,
+          y: (isMobile ? 95 : 115) + (Math.random() * 14 - 7),
+          z: Math.sin(theta) * r,
+          color: Math.random() < 0.5 ? '#ec4899' : '#a855f7',
+          size: Math.random() * 1.8 + 0.6
+        });
+      }
+    }
+
+    function createScene3FloatingNotes() {
+      notesWorld3D.innerHTML = '';
+      const isMobile = window.innerWidth < 640;
+      const baseMsgs = CONFIG.floatingMessages && CONFIG.floatingMessages.length > 0
+        ? CONFIG.floatingMessages
+        : DEFAULT_CONFIG.floatingMessages;
+
+      const totalNotes = 12;
+      const radius = isMobile ? 145 : 270;
+      const verticalSpread = isMobile ? 110 : 200;
+
+      for (let i = 0; i < totalNotes; i++) {
+        const card = document.createElement('div');
+        card.className = 'floating-note';
+        const msg = baseMsgs[i % baseMsgs.length];
+        const photoUrl = getPhoto(i);
+        const imgHeightClass = isMobile ? 'h-12' : 'h-20';
+
+        const imgEl = document.createElement('img');
+        imgEl.className = `w-full ${imgHeightClass} object-cover rounded-md mb-1 border border-white/30`;
+        setSafeImage(imgEl, photoUrl);
+
+        const pEl = document.createElement('p');
+        pEl.className = 'text-[8.5px] sm:text-[11px] leading-tight text-pink-100 font-semibold text-center line-clamp-2';
+        pEl.textContent = msg;
+
+        const dateEl = document.createElement('div');
+        dateEl.className = 'text-[7.5px] sm:text-[9px] text-pink-300/80 text-center mt-0.5';
+        dateEl.textContent = CONFIG.floatingNoteDateText;
+
+        card.appendChild(imgEl);
+        card.appendChild(pEl);
+        card.appendChild(dateEl);
+
+        // Bắt đầu từ tâm và bung ra 3D mượt mà
+        card.style.transform = `translate3d(0px, 0px, 0px) scale(0.1)`;
+        card.style.opacity = '0';
+
+        const angle = (i / totalNotes) * Math.PI * 2;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius;
+        const y = ((i % 3) - 1) * (verticalSpread / 2);
+        const rotY = angle * (180 / Math.PI);
+
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(1)}deg)`;
+        }, 60 + i * 45);
+
+        // Chạm nhẹ vào thẻ để phóng to xem ảnh & lời chúc
+        bindTap(card, () => {
+          if (!wasDraggedRecently) openPhotoZoom(photoUrl, msg);
+        });
+
+        notesWorld3D.appendChild(card);
+      }
+    }
+
+    let flowerAngle = 0;
+    function renderScene3Loop() {
+      if (!scene3Active) return;
+      gCtx.clearRect(0, 0, galaxyCanvas.width, galaxyCanvas.height);
+      const cx = galaxyCanvas.width / 2;
+      const cy = galaxyCanvas.height / 2;
+      flowerAngle += scene3VortexMode ? 0.08 : 0.016;
+
+      for (const p of flowerParticles) {
+        if (scene3VortexMode) {
+          p.x *= 0.92;
+          p.z *= 0.92;
+          p.y *= 0.94;
+        }
+        const cosA = Math.cos(flowerAngle), sinA = Math.sin(flowerAngle);
+        const px = p.x * cosA - p.z * sinA;
+        const pz = p.x * sinA + p.z * cosA;
+        const scale = (520 / (520 + pz)) * scene3Zoom;
+        gCtx.beginPath();
+        gCtx.arc(cx + px * scale, cy + p.y * scale, Math.max(0.5, p.size * scale), 0, Math.PI * 2);
+        gCtx.fillStyle = p.color;
+        gCtx.fill();
+      }
+
+      if (!isDragging3D) scene3RotY += scene3VortexMode ? 2.5 : 0.25;
+      notesWorld3D.style.transform = `scale3d(${scene3Zoom}, ${scene3Zoom}, ${scene3Zoom}) rotateX(${scene3RotX}deg) rotateY(${scene3RotY}deg)`;
+      requestAnimationFrame(renderScene3Loop);
+    }
+
+    function initScene3() {
+      scene3Active = true;
+      scene3VortexMode = false;
+      scene3Zoom = 1;
+      scene3RotX = -6;
+      document.getElementById('uiScene3Hint').textContent = CONFIG.scene3HintText;
+      document.getElementById('scene3NextBtn').textContent = CONFIG.scene3BtnText;
+      initGalaxyFlowerParticles();
+      createScene3FloatingNotes();
+      renderScene3Loop();
+    }
+
+    bindTap(document.getElementById('scene3NextBtn'), () => {
+      if (scene3VortexMode) return;
+      scene3VortexMode = true;
+      notesWorld3D.querySelectorAll('.floating-note').forEach(c => {
+        c.style.transform = `translate3d(0px, 10px, 0px) scale(0.05)`;
+        c.style.opacity = '0';
+      });
+      setTimeout(() => {
+        scene3Active = false;
+        goToScene(4);
+      }, 750);
+    });
+
+    // ================= SCENE 4 =================
+    const sphereWorld3D = document.getElementById('sphereWorld3D');
+    const scene4ActionBtn = document.getElementById('scene4ActionBtn');
+    const floatingEnvelopeModal = document.getElementById('floatingEnvelopeModal');
+    let scene4Active = false, scene4Stage = 'sphere';
+    let sphereRotY = 0, sphereRotX = -5, sphereZoom = 1, sphereTiles = [];
+
+    function initScene4() {
+      scene4Active = true;
+      scene4Stage = 'sphere';
+      sphereZoom = 1;
+      sphereRotX = -5;
+      sphereWorld3D.innerHTML = '';
+      sphereTiles = [];
+      floatingEnvelopeModal.classList.add('opacity-0', 'pointer-events-none');
+      scene4ActionBtn.classList.remove('hidden');
+      scene4ActionBtn.textContent = CONFIG.scene4WallBtnText;
+      document.getElementById('uiEnvelopePrompt').textContent = CONFIG.envelopePromptText;
+
+      const isMobile = window.innerWidth < 640;
+      const totalPhotos = 24;
+      const radius = isMobile
+        ? Math.min(window.innerWidth, window.innerHeight) * 0.31
+        : Math.min(window.innerWidth, window.innerHeight) * 0.33;
+
+      for (let i = 0; i < totalPhotos; i++) {
+        const item = document.createElement('div');
+        item.className = 'sphere-photo';
+        item.style.transform = 'translate3d(0px, 0px, 0px) scale(0.1)';
+        item.style.opacity = '0';
+
+        const photoUrl = getPhoto(i);
+        const img = document.createElement('img');
+        setSafeImage(img, photoUrl);
+        item.appendChild(img);
+
+        bindTap(item, () => {
+          if (!wasDraggedRecently && scene4Stage !== 'envelope') {
+            openPhotoZoom(photoUrl, `Kỷ niệm đẹp #${i + 1} ❤️`);
+          }
+        });
+
+        sphereWorld3D.appendChild(item);
+        sphereTiles.push(item);
+      }
+
+      setTimeout(() => {
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+        sphereTiles.forEach((tile, i) => {
+          const y = 1 - (i / (totalPhotos - 1)) * 2;
+          const rAtY = Math.sqrt(1 - y * y);
+          const theta = goldenAngle * i;
+          const x = Math.cos(theta) * rAtY * radius;
+          const z = Math.sin(theta) * rAtY * radius;
+          const py = y * radius;
+          const rotY = Math.atan2(x, z) * (180 / Math.PI);
+          const rotX = -Math.asin(y) * (180 / Math.PI);
+
+          tile.style.opacity = '1';
+          tile.style.transform = `translate3d(${x.toFixed(1)}px, ${py.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(1)}deg) rotateX(${rotX.toFixed(1)}deg)`;
+        });
+      }, 120);
+
+      renderScene4Loop();
+    }
+
+    function transformSphereToPhotoWall() {
+      scene4Stage = 'wall';
+      scene4ActionBtn.textContent = CONFIG.scene4EnvelopeBtnText;
+      sphereRotX = 0;
+      sphereRotY = 0;
+      sphereZoom = 1;
+
+      const isMobile = window.innerWidth < 640;
+      const cols = isMobile ? 3 : 4;
+      const rows = isMobile ? 4 : 3;
+      const tileW = isMobile ? 84 : 135;
+      const tileH = isMobile ? 88 : 135;
+      const gap = isMobile ? 8 : 14;
+
+      sphereTiles.forEach((tile, i) => {
+        if (i < cols * rows) {
+          const r = Math.floor(i / cols);
+          const c = i % cols;
+          const x = (c - (cols - 1) / 2) * (tileW + gap);
+          const y = (r - (rows - 1) / 2) * (tileH + gap) - (isMobile ? 22 : 10);
+
+          tile.style.width = `${tileW}px`;
+          tile.style.height = `${tileH}px`;
+          tile.style.marginLeft = `${-tileW / 2}px`;
+          tile.style.marginTop = `${-tileH / 2}px`;
+          tile.style.transform = `translate3d(${x}px, ${y}px, 15px) rotateX(0deg) rotateY(0deg)`;
+          tile.style.opacity = '1';
+          tile.style.pointerEvents = 'auto';
+        } else {
+          tile.style.transform = `translate3d(0px, 0px, -200px) scale(0)`;
+          tile.style.opacity = '0';
+          tile.style.pointerEvents = 'none';
+        }
+      });
+    }
+
+    function transformWallToEnvelopeStage() {
+      scene4Stage = 'envelope';
+      scene4ActionBtn.classList.add('hidden');
+      document.getElementById('uiScene4Hint').classList.add('hidden');
+      sphereRotX = 0;
+      sphereRotY = 0;
+      sphereZoom = 1;
+
+      const isMobile = window.innerWidth < 640;
+      const cardW = isMobile ? 66 : 100;
+      const cardH = isMobile ? 84 : 125;
+      const gap = isMobile ? 6 : 16;
+
+      sphereTiles.forEach((tile, i) => {
+        if (i < 4) {
+          const x = (i - 1.5) * (cardW + gap);
+          const y = isMobile ? 120 : 150;
+          tile.style.width = `${cardW}px`;
+          tile.style.height = `${cardH}px`;
+          tile.style.marginLeft = `${-cardW / 2}px`;
+          tile.style.marginTop = `${-cardH / 2}px`;
+          tile.style.transform = `translate3d(${x}px, ${y}px, 10px) rotateZ(${(i - 1.5) * 5}deg)`;
+          tile.style.opacity = '1';
+        } else {
+          tile.style.transform = `translate3d(0px, 100px, -150px) scale(0)`;
+          tile.style.opacity = '0';
+        }
+      });
+
+      setTimeout(() => {
+        floatingEnvelopeModal.classList.remove('opacity-0', 'pointer-events-none');
+      }, 350);
+    }
+
+    function renderScene4Loop() {
+      if (!scene4Active) return;
+      if (scene4Stage === 'sphere' && !isDragging3D) sphereRotY += 0.32;
+      sphereWorld3D.style.transform = `scale3d(${sphereZoom}, ${sphereZoom}, ${sphereZoom}) rotateX(${sphereRotX}deg) rotateY(${sphereRotY}deg)`;
+      requestAnimationFrame(renderScene4Loop);
+    }
+
+    bindTap(scene4ActionBtn, () => {
+      if (scene4Stage === 'sphere') transformSphereToPhotoWall();
+      else if (scene4Stage === 'wall') transformWallToEnvelopeStage();
+    });
+
+    bindTap(document.getElementById('envelopeTrigger'), () => {
+      scene4Active = false;
+      goToScene(5);
+    });
+
+    // ================= SCENE 5 =================
+    let typewriterTimer = null;
+    function initScene5() {
+      document.getElementById('uiLetterTopBadge').textContent = CONFIG.letterTopBadge;
+      document.getElementById('uiLetterGreeting').textContent = CONFIG.letterGreeting;
+      document.getElementById('uiLetterFooterLeft').textContent = CONFIG.letterFooterLeft;
+      document.getElementById('uiLetterSignature').textContent = CONFIG.letterSignature;
+      document.getElementById('scene5ReplayBtn').textContent = CONFIG.scene5ReplayBtnText;
+
+      const extraEl = document.getElementById('uiLetterExtra');
+      extraEl.classList.add('hidden');
+      extraEl.textContent = CONFIG.letterExtraContent || '';
+
+      const bgContainer = document.getElementById('scene5BgPhotos');
+      bgContainer.innerHTML = '';
+      const tilts = ['-rotate-6', 'rotate-6', '-rotate-3', 'rotate-3'];
+      for (let i = 0; i < 4; i++) {
+        const img = document.createElement('img');
+        setSafeImage(img, getPhoto(i));
+        img.className = `w-24 h-32 sm:w-48 sm:h-60 object-cover rounded-2xl border-2 border-white/60 shadow-xl ${tilts[i]}`;
+        bgContainer.appendChild(img);
+      }
+
+      const card = document.getElementById('loveLetterCard');
+      const textEl = document.getElementById('typewriterText');
+      card.classList.remove('open');
+      textEl.textContent = '';
+      setTimeout(() => card.classList.add('open'), 100);
+
+      if (typewriterTimer) clearInterval(typewriterTimer);
+      const fullText = CONFIG.letterContent || '';
+      let charIndex = 0;
+      setTimeout(() => {
+        typewriterTimer = setInterval(() => {
+          if (charIndex < fullText.length) {
+            textEl.textContent += fullText.charAt(charIndex);
+            charIndex++;
+          } else {
+            clearInterval(typewriterTimer);
+            if (CONFIG.letterExtraContent) extraEl.classList.remove('hidden');
+          }
+        }, 24);
+      }, 450);
+    }
+
+    bindTap(document.getElementById('scene5ReplayBtn'), () => {
+      goToScene(1);
+    });
+
+    // ================= ĐIỀU KHIỂN XOAY 3D & THU PHÓNG (PINCH-TO-ZOOM + LĂN CHUỘT) =================
+    let isDragging3D = false, wasDraggedRecently = false;
+    let startX = 0, startY = 0, prevX = 0, prevY = 0;
+    let initialPinchDistance = null, initialZoomVal = 1;
+
+    function getTouchDistance(touches) {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.hypot(dx, dy);
+    }
+
+    function startDrag(x, y, target) {
+      if (target && target.closest('button, #envelopeTrigger, #photoZoomModal, .love-letter-inner')) return;
+      isDragging3D = true;
+      wasDraggedRecently = false;
+      startX = prevX = x;
+      startY = prevY = y;
+    }
+
+    function moveDrag(x, y) {
+      if (!isDragging3D) return;
+      const dx = x - prevX;
+      const dy = y - prevY;
+      if (Math.hypot(x - startX, y - startY) > 8) {
+        wasDraggedRecently = true;
+      }
+      prevX = x;
+      prevY = y;
+
+      if (scene3Active) {
+        scene3RotY += dx * 0.45;
+        scene3RotX = Math.max(-28, Math.min(28, scene3RotX - dy * 0.25));
+      }
+      if (scene4Active && scene4Stage !== 'envelope') {
+        sphereRotY += dx * 0.45;
+        sphereRotX = Math.max(-35, Math.min(35, sphereRotX - dy * 0.25));
+      }
+    }
+
+    function endDrag() {
+      isDragging3D = false;
+      initialPinchDistance = null;
+      setTimeout(() => { wasDraggedRecently = false; }, 80);
+    }
+
+    // Sự kiện chuột trên máy tính
+    window.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY, e.target));
+    window.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
+    window.addEventListener('mouseup', endDrag);
+
+    // Con lăn chuột thu phóng trên máy tính
+    window.addEventListener('wheel', e => {
+      if (scene3Active) {
+        scene3Zoom = Math.max(0.55, Math.min(1.85, scene3Zoom - e.deltaY * 0.001));
+      } else if (scene4Active && scene4Stage !== 'envelope') {
+        sphereZoom = Math.max(0.55, Math.min(1.9, sphereZoom - e.deltaY * 0.001));
+      }
+    }, { passive: true });
+
+    // Sự kiện cảm ứng 1 ngón (xoay) & 2 ngón (thu phóng) trên Điện thoại
+    window.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        startDrag(e.touches[0].clientX, e.touches[0].clientY, e.target);
+      } else if (e.touches.length === 2) {
+        isDragging3D = false;
+        wasDraggedRecently = true;
+        initialPinchDistance = getTouchDistance(e.touches);
+        initialZoomVal = scene3Active ? scene3Zoom : sphereZoom;
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+      if (e.touches.length === 1 && isDragging3D) {
+        moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+      } else if (e.touches.length === 2 && initialPinchDistance) {
+        const currentDist = getTouchDistance(e.touches);
+        const scaleRatio = currentDist / initialPinchDistance;
+        if (scene3Active) {
+          scene3Zoom = Math.max(0.55, Math.min(1.85, initialZoomVal * scaleRatio));
+        } else if (scene4Active && scene4Stage !== 'envelope') {
+          sphereZoom = Math.max(0.55, Math.min(1.9, initialZoomVal * scaleRatio));
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchend', endDrag);
+
+    // ================= CHUYỂN CẢNH =================
+    let currentScene = 1;
+    function goToScene(sceneNumber) {
+      currentScene = sceneNumber;
+      scene3Active = false;
+      scene4Active = false;
+      closePhotoZoom();
+
+      document.querySelectorAll('.scene').forEach((sec, idx) => {
+        sec.classList.toggle('active', idx + 1 === sceneNumber);
+      });
+
+      document.querySelectorAll('.scene-dot').forEach((dot, idx) => {
+        dot.className = `scene-dot rounded-full transition-all ${
+          idx + 1 === sceneNumber
+            ? 'w-3.5 h-3.5 bg-pink-400 shadow-[0_0_8px_#f472b6]'
+            : 'w-2.5 h-2.5 bg-white/30 hover:bg-pink-300'
+        }`;
+      });
+
+      if (sceneNumber === 1) initScene1Cluster();
+      if (sceneNumber === 2) initScene2();
+      if (sceneNumber === 3) {
+        initScene3();
+      }
+      if (sceneNumber === 4) {
+        document.getElementById('uiScene4Hint').classList.remove('hidden');
+        initScene4();
+      }
+      if (sceneNumber === 5) initScene5();
+    }
+
+    window.onload = () => {
+      updateGlobalTextsAndSignature();
+      initScene1Cluster();
+    };
+  </script>
+</body>
+</html>
